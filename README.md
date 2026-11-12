@@ -2,167 +2,485 @@
 
 **Report. Track. Resolve.**
 
-A full-stack web application for reporting, assigning, tracking and resolving hostel complaints.
-Built as an Activity Based Learning (ABL) project for Software Engineering and Project Management (SPM)
-at Siddaganga Institute of Technology.
+HostelCare is a full-stack web application designed to simplify hostel complaint management. It allows students to report complaints, administrators to manage and assign them, and maintenance staff to track and resolve assigned issues.
 
-> **Status:** Student, admin, and maintenance staff workflows, notifications, feedback, frontend/API integration, tests, and contributor documentation are implemented. Jenkins, Docker, and cloud deployment remain.
+Developed as an Activity Based Learning (ABL) project for Software Engineering and Project Management (SPM) at **Siddaganga Institute of Technology (SIT), Tumakuru**.
 
-## Features
+**Project Repository:** [GitHub – HostelCare](https://github.com/Sayankuma-r/Hostelcare)
 
-- Student registration and login, complaint submission with optional image upload, personal dashboard, history, and feedback after resolution
-- Admin dashboard with live MongoDB analytics, complaint search/filter, staff assignment, priority changes, student/staff management, and feedback review
-- Maintenance staff dashboard with assigned-task filters, status updates, and required resolution notes
-- Role-protected APIs and pages, in-app notifications, and complaint status history
-- CI/CD, containerization, and cloud deployment are planned for later phases
+---
 
-## Technology stack
+## 1. Features
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | React (Vite, JavaScript), React Router, Tailwind CSS v4, Axios, Lucide React, Recharts |
-| Backend | Node.js, Express 5, Mongoose, JWT, bcryptjs, Multer, express-validator |
-| Database | MongoDB (local / Docker / Atlas) |
-| Testing | Jest + Supertest (backend), Vitest + Testing Library (frontend) |
-| DevOps | Git/GitHub, Jenkins, Docker, Docker Compose |
+### Student Module
+- Student registration and secure login.
+- Submit hostel complaints with optional image uploads.
+- Personal dashboard with complaint statistics.
+- Track complaint status and history.
+- View notifications and updates.
+- Submit feedback and ratings after complaint resolution.
 
-## Folder structure
+### Admin Module
+- Administrative dashboard with live MongoDB analytics.
+- Search, filter, and manage complaints.
+- Assign and reassign complaints to maintenance staff.
+- Update complaint priorities.
+- Manage student and staff accounts.
+- Review student feedback.
+- Monitor complaint statistics and staff performance.
 
-```
-hostelcare/
+### Maintenance Staff Module
+- Dedicated staff dashboard.
+- View assigned complaints.
+- Filter tasks by status.
+- Update complaint status.
+- Add mandatory resolution notes.
+- Track assigned workload.
+
+### Additional Features
+- Role-based authentication and authorization.
+- JWT-based secure authentication.
+- Password hashing using bcryptjs.
+- In-app notifications.
+- Complaint status history.
+- Image upload functionality.
+- Input validation and centralized error handling.
+- Automated backend and frontend tests.
+- Postman API collection.
+
+---
+
+## 2. Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React, Vite, JavaScript |
+| Routing | React Router |
+| Styling | Tailwind CSS v4 |
+| HTTP Client | Axios |
+| Icons | Lucide React |
+| Charts | Recharts |
+| Backend | Node.js, Express.js 5 |
+| Database | MongoDB |
+| ODM | Mongoose |
+| Authentication | JWT, bcryptjs |
+| File Upload | Multer |
+| Validation | express-validator |
+| Backend Testing | Jest, Supertest |
+| Frontend Testing | Vitest, Testing Library |
+| API Testing | Postman |
+| Version Control | Git, GitHub |
+| DevOps | Jenkins, Docker, Docker Compose (planned/in progress) |
+
+---
+
+## 3. Project Architecture
+
+```text
+HostelCare/
+│
 ├── backend/
 │   ├── src/
-│   │   ├── config/          # DB connection
-│   │   ├── controllers/     # Request handlers
-│   │   ├── middleware/      # Error handling, auth, RBAC
-│   │   ├── models/          # Mongoose schemas
-│   │   ├── routes/          # Express routers
-│   │   ├── utils/           # Seed script, helpers
-│   │   ├── validators/      # express-validator rules
-│   │   ├── app.js           # Express app (importable by tests)
-│   │   └── server.js        # Entry point: connects DB, starts server
-│   ├── tests/               # Jest + Supertest workflow tests
-│   ├── uploads/             # Complaint images (git-ignored)
-│   └── .env.example
+│   │   ├── config/
+│   │   │   └── db.js
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── utils/
+│   │   ├── validators/
+│   │   ├── app.js
+│   │   └── server.js
+│   │
+│   ├── tests/
+│   ├── uploads/
+│   ├── .env.example
+│   └── package.json
+│
 ├── frontend/
 │   ├── src/
-│   │   ├── components/  layouts/  pages/{public,student,admin,staff}/
-│   │   ├── context/  hooks/  services/  utils/  test/
-│   │   ├── App.jsx  main.jsx  index.css
-│   └── .env.example
-├── .github/                 # Issue and pull request templates
-├── docs/                    # Project documentation and screenshots
-├── postman/                 # API collection
-├── k8s/                     # Optional Kubernetes manifests (future phase)
-└── README.md
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   │   ├── public/
+│   │   │   ├── student/
+│   │   │   ├── admin/
+│   │   │   ├── staff/
+│   │   │   └── shared/
+│   │   ├── services/
+│   │   ├── test/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
+│   ├── .env.example
+│   └── package.json
+│
+├── .github/
+│   └── Issue and Pull Request Templates
+│
+├── postman/
+│   └── HostelCare.postman_collection.json
+│
+├── CONTRIBUTING.md
+├── README.md
+└── .gitignore
 ```
 
-## Running locally
+---
 
-Prerequisites: Node.js 18+ and a MongoDB instance (local, Docker, or a free MongoDB Atlas cluster).
+## 4. Prerequisites
+
+Install the following before running the project:
+
+- Node.js 18 or later.
+- npm.
+- MongoDB Community Server or MongoDB Atlas.
+- Git.
+- Visual Studio Code (recommended).
+- Postman (optional, for API testing).
+
+---
+
+## 5. Installation and Setup
+
+### Step 1: Clone the Repository
 
 ```bash
-# 1. Backend
-cd backend
-cp .env.example .env        # set MONGO_URI, JWT_SECRET (32+ random chars), ADMIN_EMAIL and ADMIN_PASSWORD
-npm install
-npm run seed                # create the first administrator from backend/.env
-npm run dev                 # http://localhost:5000/api/health
-
-# 2. Frontend (new terminal)
-cd frontend
-cp .env.example .env
-npm install
-npm run dev                 # http://localhost:5173
+git clone https://github.com/Sayankuma-r/Hostelcare.git
+cd Hostelcare
 ```
 
-The Vite dev server proxies `/api` and `/uploads` to the backend, so no CORS setup is needed locally. Public registration creates student accounts only. Administrators can create staff accounts through the admin API.
+### Step 2: Backend Setup
 
-### Tests and production build
+Navigate to the backend directory:
+
+```bash
+cd backend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create your environment file:
+
+```bash
+cp .env.example .env
+```
+
+On Windows PowerShell, you can also use:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Configure the environment variables in `backend/.env`:
+
+```env
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017/hostelcare
+JWT_SECRET=your_long_random_secret
+JWT_EXPIRES_IN=7d
+CLIENT_URL=http://localhost:5173
+
+ADMIN_NAME=Administrator
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your_secure_password
+```
+
+Use your own secure credentials. Never commit the actual `.env` file.
+
+### Step 3: Start MongoDB
+
+Make sure your local MongoDB server is running, or configure your MongoDB Atlas connection string in `MONGO_URI`.
+
+### Step 4: Seed the Admin Account
+
+```bash
+npm run seed
+```
+
+This creates the initial administrator using the configured environment variables, provided the seed script is available in your backend package configuration.
+
+### Step 5: Start the Backend
+
+```bash
+npm run dev
+```
+
+Backend server:
+
+`http://localhost:5000`
+
+Health check:
+
+`http://localhost:5000/api/health`
+
+### Step 6: Frontend Setup
+
+Open another terminal and navigate to the frontend directory:
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create the environment file:
+
+```bash
+cp .env.example .env
+```
+
+For Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Start the frontend:
+
+```bash
+npm run dev
+```
+
+Frontend URL:
+
+`http://localhost:5173`
+
+---
+
+## 6. API Documentation
+
+Base URL:
+
+`http://localhost:5000/api`
+
+### Authentication APIs
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/auth/register` | Register a student |
+| POST | `/auth/login` | User login |
+| GET | `/auth/me` | Get authenticated profile |
+
+### Complaint APIs
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/complaints` | Submit a complaint |
+| GET | `/complaints` | List complaints |
+| GET | `/complaints/dashboard` | Student dashboard statistics |
+| GET | `/complaints/:id` | Get complaint details |
+| PATCH | `/complaints/:id/assign` | Assign complaint |
+| PATCH | `/complaints/:id/priority` | Update priority |
+| PATCH | `/complaints/:id/status` | Update complaint status |
+| PATCH | `/complaints/:id/close` | Close complaint |
+| PATCH | `/complaints/:id/reopen` | Request reopening |
+
+### Admin APIs
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/admin/dashboard` | Admin dashboard |
+| GET | `/admin/users?role=student` | List students |
+| GET | `/admin/users?role=staff` | List staff |
+| POST | `/admin/staff` | Create staff account |
+| PATCH | `/admin/users/:id/role` | Update user role |
+| GET | `/admin/reports` | Generate complaint reports |
+
+### Staff APIs
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/staff/dashboard` | Staff dashboard |
+| GET | `/staff/complaints` | View assigned complaints |
+
+### Notification APIs
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/notifications` | Get notifications |
+| PATCH | `/notifications/:id/read` | Mark notification as read |
+| PATCH | `/notifications/read-all` | Mark all as read |
+
+### Feedback APIs
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/feedback` | Submit feedback |
+| GET | `/feedback/:complaintId` | Get complaint feedback |
+| GET | `/feedback` | Admin feedback listing |
+
+All protected endpoints require appropriate authentication and role permissions.
+
+---
+
+## 7. Postman API Testing
+
+HostelCare includes a Postman collection for testing backend APIs.
+
+Collection location:
+
+`postman/HostelCare.postman_collection.json`
+
+### Instructions
+
+1. Open Postman.
+2. Import the collection JSON file.
+3. Configure the required environment variables.
+4. Set student, admin, and staff credentials.
+5. Execute login requests to obtain authentication tokens.
+6. Test complaint creation, assignment, status updates, notifications, and feedback.
+
+Do not commit real credentials or authentication tokens.
+
+---
+
+## 8. Testing
+
+HostelCare includes automated backend and frontend tests.
+
+### Backend Tests
 
 ```bash
 npm --prefix backend test
+```
+
+Backend tests cover:
+- Authentication.
+- Authorization and role-based access.
+- Complaint submission and ownership.
+- Admin complaint assignment.
+- Staff workflows.
+- Notifications.
+- Feedback.
+- Request validation.
+
+### Frontend Tests
+
+```bash
 npm --prefix frontend test
+```
+
+Frontend tests cover:
+- Application rendering.
+- Student workflows.
+- Admin complaint management.
+- Staff complaint details.
+- Feedback forms.
+- Notifications.
+
+### Production Build
+
+```bash
 npm --prefix frontend run build
 ```
 
-The Jest/Supertest suite covers authentication, role checks, complaint submission and ownership, admin assignment, staff status transitions, notifications, feedback, and invalid input. Vitest/Testing Library covers the main student and role-specific UI workflows.
+---
 
-### Postman API collection
+## 9. Security
 
-Import [`postman/HostelCare.postman_collection.json`](./postman/HostelCare.postman_collection.json) into Postman. Set the student, administrator, and staff email/password collection variables to credentials from your local environment. Run the login requests to save their tokens automatically. The complaint submission request saves its MongoDB ID for later requests; set `staffId` and `notificationId` when testing those dependent requests. Do not commit credentials or tokens.
+Security measures implemented in the application include:
 
-## GitHub collaboration
+- JWT-based authentication.
+- Password hashing with bcryptjs.
+- Role-based access control.
+- Protected API routes.
+- Request validation.
+- Complaint ownership checks.
+- Restricted staff assignment workflows.
+- Environment-based configuration.
+- Exclusion of secrets and environment files through `.gitignore`.
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the `main`/`develop` branch workflow, feature branch naming, commit conventions, and pull request checklist. GitHub issue and pull request templates are provided under `.github/`.
+Never publish database credentials, JWT secrets, private tokens, or real user information.
 
-This checkout currently has no GitHub remote configured. After creating the project repository on GitHub, add its URL as `origin` and push only after confirming the destination with the repository owner:
+---
+
+## 10. GitHub Collaboration
+
+Repository:
+
+https://github.com/Sayankuma-r/Hostelcare
+
+### Basic Git Workflow
 
 ```bash
-git remote add origin https://github.com/<OWNER>/hostelcare.git
-git push -u origin main
+# Check current status
+git status
+
+# Stage changes
+git add .
+
+# Commit changes
+git commit -m "Describe your changes"
+
+# Push changes
+git push origin main
 ```
 
-## Environment variables
+For new features, use separate feature branches and create Pull Requests according to the guidelines in `CONTRIBUTING.md`.
 
-Copy each `.env.example` to `.env` locally and fill in the values for your machine. `.env` files and secrets are excluded by `.gitignore`; never commit credentials or tokens.
+---
 
-| Variable | Service | Purpose |
-|----------|---------|---------|
-| `MONGO_URI` | Backend | Local, Docker, or Atlas MongoDB connection string |
-| `JWT_SECRET` | Backend | Random secret of at least 32 characters |
-| `JWT_EXPIRES_IN` | Backend | JWT lifetime (default: `7d`) |
-| `PORT` | Backend | API port (default: `5000`) |
-| `CLIENT_URL` | Backend | Comma-separated allowed browser origins |
-| `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Backend | Initial administrator created by `npm run seed` |
-| `VITE_API_URL` | Frontend | Backend API base URL in production; leave empty for local Vite proxy |
+## 11. Future Enhancements
 
-## API documentation
+The following improvements are planned for future development:
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check |
-| POST | `/api/auth/register` | Register a student account |
-| POST | `/api/auth/login` | Log in as a student, admin, or staff member |
-| GET | `/api/auth/me` | Get the authenticated user's profile |
-| POST | `/api/complaints` | Submit a complaint with an optional image |
-| GET | `/api/complaints` | List the authenticated user's complaints (paginated/filterable) |
-| GET | `/api/complaints/dashboard` | Student complaint totals and recent reports |
-| GET | `/api/complaints/:id` | View a complaint and status history |
-| PATCH | `/api/complaints/:id/assign` | Assign or reassign a complaint to staff (admin only) |
-| PATCH | `/api/complaints/:id/priority` | Change complaint priority (admin only) |
-| PATCH | `/api/complaints/:id/status` | Staff start/resolution updates or student resolution confirmation |
-| PATCH | `/api/complaints/:id/close` | Close a resolved complaint (admin only) |
-| PATCH | `/api/complaints/:id/reopen` | Request reopening a resolved or closed complaint |
-| GET | `/api/notifications` | List the signed-in user's notifications and unread count |
-| PATCH | `/api/notifications/:id/read` | Mark one owned notification as read |
-| PATCH | `/api/notifications/read-all` | Mark all of the signed-in user's notifications as read |
-| POST | `/api/feedback` | Submit a rating and comment for a resolved complaint (student only) |
-| GET | `/api/feedback/:complaintId` | Read feedback for a complaint (student owner or admin) |
-| GET | `/api/feedback` | List all feedback (admin only) |
-| GET | `/api/admin/dashboard` | Live administrative counts, trends, and staff performance |
-| GET | `/api/admin/users?role=student` | Search and list student accounts (admin only) |
-| GET | `/api/admin/users?role=staff` | Search and list staff accounts (admin only) |
-| POST | `/api/admin/staff` | Create a maintenance staff account (admin only) |
-| PATCH | `/api/admin/users/:id/role` | Change a user's role (admin only) |
-| GET | `/api/admin/reports` | Complaint report summary (admin only) |
-| GET | `/api/staff/dashboard` | Staff workload counts and recent assigned tasks |
-| GET | `/api/staff/complaints` | Paginated, filtered list of the current staff member's assignments |
+- Jenkins-based CI/CD pipeline.
+- Docker containerization.
+- Docker Compose configuration.
+- Cloud deployment.
+- Kubernetes deployment (optional).
+- Email and real-time notifications.
+- Advanced analytics and reporting.
+- Improved mobile responsiveness.
 
-Staff status updates require assignment ownership and resolution notes. Students can rate and comment once a complaint is resolved or closed; administrators can review submitted feedback. Notification reads and updates are scoped to the signed-in user.
+---
 
-## Screenshots
+## 12. Project Status
 
-No screenshots are committed yet. For a presentation, capture the student dashboard, admin overview, complaint detail, and staff task view from a local run and save sanitized images under `docs/screenshots/`. Use demo accounts/data and remove names, email addresses, and other personal information before sharing screenshots.
+| Component | Status |
+|---|---|
+| Student Authentication | Implemented |
+| Admin Authentication | Implemented |
+| Staff Authentication | Implemented |
+| Complaint Management | Implemented |
+| Staff Assignment | Implemented |
+| Notifications | Implemented |
+| Feedback System | Implemented |
+| Frontend Integration | Implemented |
+| Automated Tests | Implemented |
+| Postman Collection | Available |
+| Jenkins CI/CD | Planned / In progress |
+| Docker | Planned / In progress |
+| Cloud Deployment | Planned |
 
-## Deployment
+---
 
-Cloud deployment is not configured yet (Phase 12). Before deployment:
+## 13. Contributors
 
-1. Provision MongoDB Atlas and create a database user with only the permissions the app needs.
-2. Set backend production variables, including `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL`, and `NODE_ENV=production`.
-3. Set `VITE_API_URL` to the deployed backend API URL ending in `/api`, then run `npm run build` in `frontend`.
-4. Configure the backend health probe to use `/api/health`.
-5. Deploy the frontend and backend to the selected providers; do not commit provider credentials or `.env` files.
+Developed as an Activity Based Learning (ABL) project for Software Engineering and Project Management at Siddaganga Institute of Technology.
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for branch, commit, and pull request conventions.
+Contributions, suggestions, bug reports, and feature requests are welcome.
+
+Please read `CONTRIBUTING.md` before submitting contributions.
+
+---
+
+## License
+
+This project is developed for academic and educational purposes.
+
+A formal open-source license can be added when the project maintainers decide on the licensing terms.
+
+---
+
+**HostelCare – Report. Track. Resolve.**
