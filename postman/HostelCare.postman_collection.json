@@ -1,0 +1,375 @@
+{
+  "info": {
+    "_postman_id": "b0357bbc-4b2f-4725-b172-a1c58e8d2a16",
+    "name": "HostelCare API",
+    "description": "Manual API workflows for student, admin, and maintenance staff. Set credentials and resource IDs in collection variables before running dependent requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "studentEmail", "value": "" },
+    { "key": "studentPassword", "value": "" },
+    { "key": "adminEmail", "value": "" },
+    { "key": "adminPassword", "value": "" },
+    { "key": "staffEmail", "value": "" },
+    { "key": "staffPassword", "value": "" },
+    { "key": "staffName", "value": "Maintenance Staff" },
+    { "key": "staffPhone", "value": "" },
+    { "key": "studentToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "staffToken", "value": "" },
+    { "key": "staffId", "value": "" },
+    { "key": "complaintMongoId", "value": "" },
+    { "key": "notificationId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Student\",\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\",\n  \"hostel\": \"Main Hostel\",\n  \"block\": \"A\",\n  \"roomNumber\": \"101\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login student",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Login succeeds', function () { pm.response.to.have.status(200); });",
+                "if (pm.response.code === 200) pm.collectionVariables.set('studentToken', pm.response.json().token);"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Current student profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "Login administrator",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Login succeeds', function () { pm.response.to.have.status(200); });",
+                "if (pm.response.code === 200) pm.collectionVariables.set('adminToken', pm.response.json().token);"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login maintenance staff",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Login succeeds', function () { pm.response.to.have.status(200); });",
+                "if (pm.response.code === 200) pm.collectionVariables.set('staffToken', pm.response.json().token);"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{staffEmail}}\",\n  \"password\": \"{{staffPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Student complaints",
+      "item": [
+        {
+          "name": "Student dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/complaints/dashboard"
+          }
+        },
+        {
+          "name": "Submit complaint",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Complaint created', function () { pm.response.to.have.status(201); });",
+                "if (pm.response.code === 201) pm.collectionVariables.set('complaintMongoId', pm.response.json().complaint._id);"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Leaking shower\",\n  \"description\": \"The shower is leaking and needs repair.\",\n  \"category\": \"Plumbing\",\n  \"priority\": \"Medium\",\n  \"hostel\": \"Main Hostel\",\n  \"block\": \"A\",\n  \"roomNumber\": \"101\"\n}"
+            },
+            "url": "{{baseUrl}}/complaints"
+          }
+        },
+        {
+          "name": "List my complaints",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/complaints?page=1&limit=20"
+          }
+        },
+        {
+          "name": "Get complaint details",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/complaints/{{complaintMongoId}}"
+          }
+        },
+        {
+          "name": "Request complaint reopening",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"remarks\": \"The issue is still unresolved.\"\n}" },
+            "url": "{{baseUrl}}/complaints/{{complaintMongoId}}/reopen"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Administrator",
+      "item": [
+        {
+          "name": "Admin dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/dashboard"
+          }
+        },
+        {
+          "name": "Search students",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/users?role=student&search=&page=1&limit=50"
+          }
+        },
+        {
+          "name": "Create maintenance staff",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Staff account created', function () { pm.response.to.have.status(201); });",
+                "if (pm.response.code === 201) pm.collectionVariables.set('staffId', pm.response.json().user._id);"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{staffName}}\",\n  \"email\": \"{{staffEmail}}\",\n  \"password\": \"{{staffPassword}}\",\n  \"phone\": \"{{staffPhone}}\"\n}"
+            },
+            "url": "{{baseUrl}}/admin/staff"
+          }
+        },
+        {
+          "name": "Assign complaint to staff",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"staffId\": \"{{staffId}}\"\n}" },
+            "url": "{{baseUrl}}/complaints/{{complaintMongoId}}/assign"
+          }
+        },
+        {
+          "name": "Update complaint priority",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"priority\": \"High\"\n}" },
+            "url": "{{baseUrl}}/complaints/{{complaintMongoId}}/priority"
+          }
+        },
+        {
+          "name": "Close resolved complaint",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/complaints/{{complaintMongoId}}/close"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Maintenance staff",
+      "item": [
+        {
+          "name": "Staff dashboard",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{staffToken}}" }],
+            "url": "{{baseUrl}}/staff/dashboard"
+          }
+        },
+        {
+          "name": "List assigned tasks",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{staffToken}}" }],
+            "url": "{{baseUrl}}/staff/complaints?status=ASSIGNED&page=1&limit=20"
+          }
+        },
+        {
+          "name": "Accept and start work",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{staffToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"remarks\": \"Work accepted and started.\"\n}" },
+            "url": "{{baseUrl}}/complaints/{{complaintMongoId}}/status"
+          }
+        },
+        {
+          "name": "Resolve with notes",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{staffToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"RESOLVED\",\n  \"remarks\": \"Replaced the damaged pipe and verified the repair.\"\n}" },
+            "url": "{{baseUrl}}/complaints/{{complaintMongoId}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Notifications and feedback",
+      "item": [
+        {
+          "name": "List notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/notifications"
+          }
+        },
+        {
+          "name": "Mark notification as read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/notifications/{{notificationId}}/read"
+          }
+        },
+        {
+          "name": "Mark all notifications as read",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/notifications/read-all"
+          }
+        },
+        {
+          "name": "Submit complaint feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"complaintId\": \"{{complaintMongoId}}\",\n  \"rating\": 5,\n  \"comment\": \"The maintenance issue was fixed quickly.\"\n}" },
+            "url": "{{baseUrl}}/feedback"
+          }
+        },
+        {
+          "name": "List all feedback (admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/feedback"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Health and authorization checks",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
+        },
+        {
+          "name": "Admin dashboard without credentials (expect 401)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/admin/dashboard"
+          }
+        }
+      ]
+    }
+  ]
+}

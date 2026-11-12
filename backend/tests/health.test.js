@@ -14,4 +14,22 @@ describe('Health check', () => {
     expect(res.statusCode).toBe(404);
     expect(res.body.success).toBe(false);
   });
+
+  it('allows the Vite loopback origin used by the local browser', async () => {
+    const res = await request(app)
+      .get('/api/health')
+      .set('Origin', 'http://127.0.0.1:5173');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.headers['access-control-allow-origin']).toBe('http://127.0.0.1:5173');
+  });
+
+  it('rejects unconfigured origins with a forbidden response', async () => {
+    const res = await request(app)
+      .get('/api/health')
+      .set('Origin', 'https://not-allowed.example');
+
+    expect(res.statusCode).toBe(403);
+    expect(res.body.message).toBe('Origin not allowed by CORS');
+  });
 });

@@ -26,4 +26,11 @@ api.interceptors.response.use(
 export const getErrorMessage = (error) =>
   error.response?.data?.message || error.message || 'Something went wrong'
 
+export const getUploadUrl = (uploadPath) => {
+  if (!uploadPath) return ''
+  const apiUrl = import.meta.env.VITE_API_URL || '/api'
+  const apiOrigin = /^https?:\/\//i.test(apiUrl) ? new URL(apiUrl).origin : ''
+  return `${apiOrigin}${uploadPath}`
+}
+
 export default api

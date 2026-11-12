@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Building2, CheckCircle2, ShieldAlert } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import api from '../../services/api'
 
 export default function Landing() {
@@ -21,8 +22,16 @@ export default function Landing() {
         <h1 className="text-3xl font-bold text-navy-800">HostelCare</h1>
         <p className="mt-1 text-teal-600 font-medium">Report. Track. Resolve.</p>
         <p className="mt-4 text-sm text-slate-500">
-          Hostel Complaint Management System — Phase 1 project setup.
+          Hostel complaint management, from first report to final resolution.
         </p>
+        <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+          <Link className="btn-primary" to="/login">
+            Sign in
+          </Link>
+          <Link className="btn-secondary" to="/register">
+            Student registration
+          </Link>
+        </div>
         <div
           className="mt-6 inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-1.5 text-sm"
           data-testid="api-status"
