@@ -10,10 +10,10 @@ import App from '../App'
 describe('App', () => {
   it('renders the HostelCare landing page', async () => {
     render(<App />)
-    expect(screen.getByText('HostelCare')).toBeInTheDocument()
+    expect(screen.getAllByText('HostelCare')).toHaveLength(2)
     expect(screen.getByText('Report. Track. Resolve.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login')
-    expect(screen.getByRole('link', { name: 'Student registration' })).toHaveAttribute('href', '/register')
+    expect(screen.getByRole('link', { name: 'Report an issue' })).toHaveAttribute('href', '/register')
     expect(await screen.findByText(/API: online/)).toBeInTheDocument()
   })
 })

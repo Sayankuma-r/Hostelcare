@@ -1,5 +1,6 @@
-import { LogOut, ReceiptText, ShieldCheck, UserRound } from 'lucide-react'
+import { LogOut, ShieldCheck, UserRound } from 'lucide-react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import BrandMark from '../components/BrandMark'
 import NotificationBell from '../components/NotificationBell'
 import { useAuth } from '../context/AuthContext'
 
@@ -44,9 +45,7 @@ export default function DashboardLayout({ role = 'student' }) {
     <div className="min-h-screen bg-slate-100">
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-72 bg-navy-800 p-6 text-white md:block">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10">
-            <ReceiptText className="h-5 w-5" />
-          </div>
+          <BrandMark className="brand-mark--light" />
           <div>
             <p className="text-lg font-bold">HostelCare</p>
             <p className="text-xs text-slate-300">{role}</p>
@@ -93,7 +92,10 @@ export default function DashboardLayout({ role = 'student' }) {
           <NotificationBell role={role} />
         </div>
         <div className="mb-5 flex items-center justify-between gap-3 rounded-xl bg-white px-4 py-3 shadow-sm md:hidden">
-          <Link to={`/${role}/dashboard`} className="font-bold text-navy-800">HostelCare</Link>
+          <Link to={`/${role}/dashboard`} className="flex shrink-0 items-center gap-2 font-bold text-navy-800">
+            <BrandMark className="brand-mark--compact" />
+            HostelCare
+          </Link>
           <nav className="flex min-w-0 gap-3 overflow-x-auto text-xs text-slate-600">
             {items.map((item) => (
               <Link key={item.path} to={item.path} className="whitespace-nowrap hover:text-teal-700">{item.label}</Link>

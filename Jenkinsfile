@@ -11,6 +11,15 @@ pipeline {
         pollSCM('H/5 * * * *')
     }
 
+    environment {
+        NODE_ENV = 'test'
+        PORT = '5000'
+        JWT_EXPIRES_IN = '7d'
+        CLIENT_URL = 'http://localhost:5173'
+        ADMIN_NAME = 'Hostel Warden'
+        ADMIN_EMAIL = 'admin@example.com'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -28,6 +37,14 @@ pipeline {
             }
         }
 
+        stage('MongoDB Connection Check') {
+            steps {
+                bat '''
+                powershell -NoProfile -Command "if (Test-NetConnection 127.0.0.1 -Port 27017 -InformationLevel Quiet) { Write-Host 'MongoDB port is reachable' } else { Write-Error 'MongoDB is not reachable on port 27017'; exit 1 }"
+                '''
+            }
+        }
+
         stage('Install Backend Dependencies') {
             steps {
                 bat 'npm --prefix backend ci'
@@ -42,7 +59,14 @@ pipeline {
 
         stage('Backend Tests') {
             steps {
-                bat 'npm --prefix backend test'
+                withCredentials([
+                    string(credentialsId: 'hostelcare-jwt-secret',
+                           variable: 'JWT_SECRET'),
+                    string(credentialsId: 'hostelcare-mongo-uri',
+                           variable: 'MONGO_URI')
+                ]) {
+                    bat 'npm --prefix backend test'
+                }
             }
         }
 
@@ -61,7 +85,7 @@ pipeline {
 
     post {
         success {
-            echo 'HostelCare CI/CD pipeline completed successfully!'
+            echo 'HostelCare CI pipeline completed successfully!'
         }
 
         failure {
