@@ -6,7 +6,8 @@ const getNotifications = async (req, res, next) => {
       Notification.find({ userId: req.user._id })
         .sort({ createdAt: -1 })
         .limit(50)
-        .populate('complaintId', 'complaintId title'),
+        .populate('complaintId', 'complaintId title')
+        .populate('announcementId', 'title category'),
       Notification.countDocuments({ userId: req.user._id, isRead: false }),
     ]);
     return res.json({ success: true, notifications, unreadCount });

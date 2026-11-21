@@ -4,7 +4,12 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import api, { getErrorMessage } from '../../services/api'
 
-const complaintRoute = (role, id) => id ? `/${role}/complaints/${id}` : `/${role}/notifications`
+const notificationRoute = (role, notification) => {
+  const announcementId = notification.announcementId?._id || notification.announcementId
+  if (announcementId) return `/${role}/announcements/${announcementId}`
+  const complaintId = notification.complaintId?._id || notification.complaintId
+  return complaintId ? `/${role}/complaints/${complaintId}` : `/${role}/notifications`
+}
 
 export default function NotificationsPage() {
   const { user } = useAuth()
@@ -70,7 +75,6 @@ export default function NotificationsPage() {
         ) : (
           <ul className="divide-y divide-slate-100">
             {notifications.map((notification) => {
-              const complaintId = notification.complaintId?._id || notification.complaintId
               return (
                 <li key={notification._id} className={`flex gap-3 p-5 sm:gap-4 ${notification.isRead ? 'bg-white' : 'bg-teal-50/40'}`}>
                   <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${notification.isRead ? 'bg-slate-200' : 'bg-teal-600'}`} aria-label={notification.isRead ? 'Read' : 'Unread'} />
@@ -78,7 +82,7 @@ export default function NotificationsPage() {
                     <p className={`text-sm leading-6 ${notification.isRead ? 'text-slate-600' : 'font-medium text-slate-800'}`}>{notification.message}</p>
                     <p className="mt-1 text-xs text-slate-400">{new Date(notification.createdAt).toLocaleString()}</p>
                     <div className="mt-3 flex flex-wrap gap-4">
-                      {complaintId && <Link className="inline-flex items-center gap-1 text-xs font-semibold text-teal-700 hover:text-teal-800" to={complaintRoute(user.role, complaintId)}><ExternalLink size={14} /> Open complaint</Link>}
+                      {(notification.complaintId || notification.announcementId) && <Link className="inline-flex items-center gap-1 text-xs font-semibold text-teal-700 hover:text-teal-800" to={notificationRoute(user.role, notification)}><ExternalLink size={14} /> Open update</Link>}
                       {!notification.isRead && <button type="button" className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700" onClick={() => markRead(notification._id)}><Check size={14} /> Mark as read</button>}
                     </div>
                   </div>

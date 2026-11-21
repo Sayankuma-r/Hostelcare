@@ -14,24 +14,29 @@ export default function StudentDashboard() {
   const [complaints, setComplaints] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [announcementError, setAnnouncementError] = useState('')
+  const [announcements, setAnnouncements] = useState([])
+  const [announcementsLoading, setAnnouncementsLoading] = useState(true)
 
   useEffect(() => {
     let active = true
-    const fetchDashboard = async () => {
-      try {
-        const response = await api.get('/complaints/dashboard')
+    api.get('/complaints/dashboard')
+      .then((response) => {
         if (active) {
           setStats(response.data.stats)
           setComplaints(response.data.recentComplaints || [])
         }
-      } catch (requestError) {
-        if (active) setError(getErrorMessage(requestError))
-      } finally {
-        if (active) setLoading(false)
-      }
-    }
+      })
+      .catch((requestError) => { if (active) setError(getErrorMessage(requestError)) })
+      .finally(() => { if (active) setLoading(false) })
 
-    fetchDashboard()
+    api.get('/announcements')
+      .then((response) => {
+        if (active) setAnnouncements(response.data.announcements.slice(0, 3))
+      })
+      .catch((requestError) => { if (active) setAnnouncementError(getErrorMessage(requestError)) })
+      .finally(() => { if (active) setAnnouncementsLoading(false) })
+
     return () => { active = false }
   }, [])
 
@@ -50,9 +55,30 @@ export default function StudentDashboard() {
           <h1 className="mt-2 text-3xl font-bold">Welcome back, {user?.name?.split(' ')[0] || 'Student'}</h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">Stay on top of hostel issues and follow every report as it gets resolved.</p>
         </div>
-        <Link to="/student/complaints/new" className="btn-accent shrink-0">
-          <Plus size={18} /> Submit a complaint
-        </Link>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Link to="/student/complaints/new" className="btn-accent shrink-0"><Plus size={18} /> Submit a complaint</Link>
+        </div>
+      </section>
+
+      <section className="card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
+          <div><h2 className="font-semibold text-navy-800">Hostel announcements</h2><p className="mt-1 text-xs text-slate-500">Notices relevant to your hostel</p></div>
+          <Link to="/student/announcements" className="text-sm font-semibold text-teal-700">View all</Link>
+        </div>
+        {announcementError && <p className="px-5 pt-4 text-sm text-red-700" role="alert">{announcementError}</p>}
+        {announcementsLoading ? <p className="p-5 text-sm text-slate-500">Loading announcements…</p> : announcements.length === 0 ? (
+          <p className="p-5 text-sm text-slate-500">There are no current announcements.</p>
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {announcements.map((announcement) => (
+              <li key={announcement._id}><Link to={`/student/announcements/${announcement._id}`} className="block p-5 hover:bg-slate-50">
+                <div className="flex items-center gap-2"><span className="text-xs font-medium text-teal-700">{announcement.category}</span>{!announcement.isRead && <span className="rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-semibold text-teal-800">Unread</span>}</div>
+                <h3 className="mt-1 font-semibold text-slate-800">{announcement.title}</h3>
+                <p className="mt-1 line-clamp-2 text-sm text-slate-500">{announcement.content}</p>
+              </Link></li>
+            ))}
+          </ul>
+        )}
       </section>
 
       {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">{error}</p>}

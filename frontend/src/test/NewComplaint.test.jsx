@@ -17,8 +17,8 @@ vi.mock('../services/api', () => ({
 
 import NewComplaint from '../pages/student/NewComplaint'
 
-const renderForm = () => render(
-  <MemoryRouter initialEntries={['/student/complaints/new']}>
+const renderForm = (initialEntry = '/student/complaints/new') => render(
+  <MemoryRouter initialEntries={[initialEntry]}>
     <Routes>
       <Route path="/student/complaints/new" element={<NewComplaint />} />
       <Route path="/student/complaints/:id" element={<p>Complaint details view</p>} />
@@ -60,4 +60,5 @@ describe('NewComplaint', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Choose a JPEG, PNG, or WebP image.')
     expect(post).not.toHaveBeenCalled()
   })
+
 })

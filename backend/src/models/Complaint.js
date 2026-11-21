@@ -104,5 +104,4 @@ const complaintSchema = new mongoose.Schema(
 complaintSchema.index({ studentId: 1, createdAt: -1 });
 complaintSchema.index({ assignedTo: 1, status: 1 });
 complaintSchema.index({ category: 1, priority: 1, status: 1 });
-
 module.exports = mongoose.model('Complaint', complaintSchema);

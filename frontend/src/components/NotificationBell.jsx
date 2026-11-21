@@ -3,9 +3,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api, { getErrorMessage } from '../services/api'
 
-const getComplaintRoute = (role, complaintId) => {
-  if (!complaintId) return `/${role}/notifications`
-  return `/${role}/complaints/${complaintId}`
+const getNotificationRoute = (role, notification) => {
+  const announcementId = notification.announcementId?._id || notification.announcementId
+  if (announcementId) return `/${role}/announcements/${announcementId}`
+  const complaintId = notification.complaintId?._id || notification.complaintId
+  if (complaintId) return `/${role}/complaints/${complaintId}`
+  return `/${role}/notifications`
 }
 
 export default function NotificationBell({ role }) {
@@ -53,9 +56,8 @@ export default function NotificationBell({ role }) {
 
   const openComplaint = async (notification) => {
     if (!notification.isRead) await markRead(notification._id)
-    const complaintId = notification.complaintId?._id || notification.complaintId
     setOpen(false)
-    navigate(getComplaintRoute(role, complaintId))
+    navigate(getNotificationRoute(role, notification))
   }
 
   return (

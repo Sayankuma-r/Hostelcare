@@ -12,6 +12,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const staffRoutes = require('./routes/staffRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const announcementRoutes = require('./routes/announcementRoutes');
 
 const configuredOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
   .split(',')
@@ -57,6 +58,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/announcements', announcementRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

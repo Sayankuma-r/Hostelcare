@@ -28,6 +28,7 @@ Developed as an Activity Based Learning (ABL) project for Software Engineering a
 - Manage student and staff accounts.
 - Review student feedback.
 - Monitor complaint statistics and staff performance.
+- Review all registered users and publish targeted hostel announcements.
 
 ### Maintenance Staff Module
 - Dedicated staff dashboard.
@@ -46,6 +47,7 @@ Developed as an Activity Based Learning (ABL) project for Software Engineering a
 - Image upload functionality.
 - Input validation and centralized error handling.
 - Automated backend and frontend tests.
+- Announcement categories, priority, expiry, audience targeting, unread state, and important-notice notifications.
 - Postman API collection.
 
 ---
@@ -203,7 +205,7 @@ Make sure your local MongoDB server is running, or configure your MongoDB Atlas 
 npm run seed
 ```
 
-This creates the initial administrator using the configured environment variables, provided the seed script is available in your backend package configuration.
+The seed reads `backend/.env`. It creates an administrator if the configured email is new. If that email already belongs to a non-admin account, it promotes the account and sets its password to `ADMIN_PASSWORD`. Existing administrator passwords are not changed by subsequent runs.
 
 ### Step 5: Start the Backend
 
@@ -255,6 +257,14 @@ Frontend URL:
 
 `http://localhost:5173`
 
+### Admin panel and announcements
+
+Sign in with an administrator account and open `/admin` to access the dedicated admin panel. **Registered Users** lists student, staff, and administrator accounts with search, role filters, and pagination; passwords are never included in the API response.
+
+Use **Announcements** in the admin navigation to draft, edit, publish, and archive notices. Published notices can target students/staff and optionally a hostel/block. Emergency-category and High/Urgent announcements create in-app notifications for the matching accounts. Students and staff can read applicable, unexpired notices from their dashboards and announcement feed.
+
+Complaints use the hostel, block, and room information entered in the complaint form. No QR scanning or QR-location management is required. MongoDB/Mongoose creates the collections and indexes when the application starts; no data migration is needed. Ensure the production frontend origin is included in `CLIENT_URL` as usual.
+
 ---
 
 ## 6. API Documentation
@@ -285,13 +295,25 @@ Base URL:
 | PATCH | `/complaints/:id/close` | Close complaint |
 | PATCH | `/complaints/:id/reopen` | Request reopening |
 
+### Announcement APIs
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/announcements` | List announcements visible to the authenticated user and unread count |
+| GET | `/announcements/:id` | Read an eligible announcement (admins can also view drafts/archived notices) |
+| PATCH | `/announcements/:id/read` | Mark an eligible announcement as read |
+| POST | `/announcements` | Admin create a draft or published announcement |
+| PUT | `/announcements/:id` | Admin update an announcement |
+| PATCH | `/announcements/:id/status` | Admin publish, archive, or return an announcement to draft |
+
 ### Admin APIs
 
 | Method | Endpoint | Description |
 |---|---|---|
 | GET | `/admin/dashboard` | Admin dashboard |
-| GET | `/admin/users?role=student` | List students |
-| GET | `/admin/users?role=staff` | List staff |
+| GET | `/admin/users?role=student` | Search and page through registered students |
+| GET | `/admin/users?role=staff` | Search and page through registered staff |
+| GET | `/admin/users?role=all` | Search and page through all registered users |
 | POST | `/admin/staff` | Create staff account |
 | PATCH | `/admin/users/:id/role` | Update user role |
 | GET | `/admin/reports` | Generate complaint reports |
@@ -363,6 +385,7 @@ Backend tests cover:
 - Notifications.
 - Feedback.
 - Request validation.
+- Announcement endpoints enforce role, hostel/block targeting, publication, and expiry access rules.
 
 ### Frontend Tests
 
@@ -395,6 +418,7 @@ Security measures implemented in the application include:
 - Role-based access control.
 - Protected API routes.
 - Request validation.
+- Announcement visibility, read state, role restrictions, and important-notice notifications.
 - Complaint ownership checks.
 - Restricted staff assignment workflows.
 - Environment-based configuration.

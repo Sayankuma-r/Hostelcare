@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 export default function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { login } = useAuth()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
@@ -26,7 +27,11 @@ export default function Login() {
         admin: '/admin/dashboard',
         staff: '/staff/dashboard',
       }
-      navigate(routeMap[role] || '/')
+      const returnTo = location.state?.from
+      const studentReturnPath = role === 'student' && returnTo?.pathname?.startsWith('/student/')
+        ? `${returnTo.pathname}${returnTo.search || ''}`
+        : null
+      navigate(studentReturnPath || routeMap[role] || '/')
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed')
     } finally {

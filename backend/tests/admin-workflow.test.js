@@ -101,6 +101,49 @@ describe('Administrator dashboard and assignment workflows', () => {
     expect(response.body.staffPerformance[0].resolutionRate).toBe(75);
   });
 
+  it('returns report totals for status, category, priority, and monthly trends', async () => {
+    Complaint.aggregate.mockImplementation(async (pipeline) => {
+      if (pipeline[0]?.$group?._id === '$status') return [{ _id: 'SUBMITTED', count: 3 }];
+      if (pipeline[0]?.$group?._id === '$category') return [{ _id: 'Plumbing', count: 3 }];
+      if (pipeline[0]?.$group?._id === '$priority') return [{ _id: 'High', count: 2 }];
+      if (pipeline[0]?.$group?._id?.month) return [{ _id: { month: 11, year: 2026 }, count: 3 }];
+      return [];
+    });
+
+    const response = await request(app)
+      .get('/api/admin/reports')
+      .set('Authorization', 'Bearer admin-token');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.totalComplaints).toBe(3);
+    expect(response.body.summary).toEqual([{ _id: 'SUBMITTED', count: 3 }]);
+    expect(response.body.categoryData).toEqual([{ _id: 'Plumbing', count: 3 }]);
+    expect(response.body.priorityData).toEqual([{ _id: 'High', count: 2 }]);
+  });
+
+  it('lists registered users by role and paginates results without returning passwords', async () => {
+    User.countDocuments.mockResolvedValue(26);
+    User.find.mockReturnValue(buildQuery([{ _id: 'student-1', name: 'Student One', role: 'student' }]));
+
+    const response = await request(app)
+      .get('/api/admin/users?role=student&search=Student&page=2&limit=25')
+      .set('Authorization', 'Bearer admin-token');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toMatchObject({ total: 26, page: 2, pages: 2 });
+    expect(response.body.users).toEqual([{ _id: 'student-1', name: 'Student One', role: 'student' }]);
+    expect(User.find).toHaveBeenCalledWith({
+      role: 'student',
+      $or: [
+        { name: { $regex: 'Student', $options: 'i' } },
+        { email: { $regex: 'Student', $options: 'i' } },
+      ],
+    });
+    expect(User.find.mock.results[0].value.skip).toHaveBeenCalledWith(25);
+    expect(User.find.mock.results[0].value.limit).toHaveBeenCalledWith(25);
+    expect(User.find.mock.results[0].value.select).toHaveBeenCalledWith('-password');
+  });
+
   it('creates staff accounts with a staff role and never returns their password', async () => {
     User.create.mockImplementation(async (user) => ({
       ...user,

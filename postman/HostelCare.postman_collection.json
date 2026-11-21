@@ -20,7 +20,8 @@
     { "key": "staffToken", "value": "" },
     { "key": "staffId", "value": "" },
     { "key": "complaintMongoId", "value": "" },
-    { "key": "notificationId", "value": "" }
+    { "key": "notificationId", "value": "" },
+    { "key": "announcementId", "value": "" }
   ],
   "item": [
     {
@@ -353,7 +354,84 @@
       ]
     },
     {
-      "name": "6. Health and authorization checks",
+      "name": "6. Announcements",
+      "item": [
+        {
+          "name": "Create a draft announcement (admin)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "if (pm.response.code === 201) pm.collectionVariables.set('announcementId', pm.response.json().announcement._id);"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Water supply maintenance\",\n  \"content\": \"Water supply will be interrupted tomorrow morning for scheduled maintenance.\",\n  \"category\": \"Water\",\n  \"priority\": \"Medium\",\n  \"audience\": [\"student\", \"staff\"],\n  \"status\": \"Draft\"\n}"
+            },
+            "url": "{{baseUrl}}/announcements"
+          }
+        },
+        {
+          "name": "Publish a draft announcement (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Published\"\n}" },
+            "url": "{{baseUrl}}/announcements/{{announcementId}}/status"
+          }
+        },
+        {
+          "name": "List relevant announcements (student)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/announcements"
+          }
+        },
+        {
+          "name": "Read an announcement (student)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/announcements/{{announcementId}}"
+          }
+        },
+        {
+          "name": "Mark an announcement read (student)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": "{{baseUrl}}/announcements/{{announcementId}}/read"
+          }
+        },
+        {
+          "name": "Archive an announcement (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Archived\"\n}" },
+            "url": "{{baseUrl}}/announcements/{{announcementId}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Health and authorization checks",
       "item": [
         {
           "name": "Health check",

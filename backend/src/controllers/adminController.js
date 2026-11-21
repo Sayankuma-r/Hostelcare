@@ -193,16 +193,39 @@ const updateUserRole = async (req, res, next) => {
 
 const getReports = async (req, res, next) => {
   try {
-    const summary = await Complaint.aggregate([
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 },
+    const [summary, categoryData, priorityData, monthlyData] = await Promise.all([
+      Complaint.aggregate([
+        { $group: { _id: '$status', count: { $sum: 1 } } },
+        { $sort: { _id: 1 } },
+      ]),
+      Complaint.aggregate([
+        { $group: { _id: '$category', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]),
+      Complaint.aggregate([
+        { $group: { _id: '$priority', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]),
+      Complaint.aggregate([
+        {
+          $group: {
+            _id: { month: { $month: '$createdAt' }, year: { $year: '$createdAt' } },
+            count: { $sum: 1 },
+          },
         },
-      },
+        { $sort: { '_id.year': 1, '_id.month': 1 } },
+      ]),
     ]);
 
-    return res.json({ success: true, summary });
+    const totalComplaints = summary.reduce((total, item) => total + item.count, 0);
+    return res.json({
+      success: true,
+      summary,
+      categoryData,
+      priorityData,
+      monthlyData,
+      totalComplaints,
+    });
   } catch (error) {
     return next(error);
   }

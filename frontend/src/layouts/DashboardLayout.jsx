@@ -9,13 +9,15 @@ const navItems = {
     { label: 'Dashboard', path: '/student/dashboard' },
     { label: 'Submit Complaint', path: '/student/complaints/new' },
     { label: 'My Complaints', path: '/student/complaints' },
+    { label: 'Announcements', path: '/student/announcements' },
     { label: 'Notifications', path: '/student/notifications' },
     { label: 'Profile', path: '/student/profile' },
   ],
   admin: [
     { label: 'Dashboard', path: '/admin/dashboard' },
     { label: 'Complaints', path: '/admin/complaints' },
-    { label: 'Students', path: '/admin/students' },
+    { label: 'Announcements', path: '/admin/announcements' },
+    { label: 'Registered Users', path: '/admin/users' },
     { label: 'Staff', path: '/admin/staff' },
     { label: 'Notifications', path: '/admin/notifications' },
     { label: 'Feedback', path: '/admin/feedback' },
@@ -24,6 +26,7 @@ const navItems = {
   staff: [
     { label: 'Dashboard', path: '/staff/dashboard' },
     { label: 'Assigned Tasks', path: '/staff/complaints' },
+    { label: 'Announcements', path: '/staff/announcements' },
     { label: 'Notifications', path: '/staff/notifications' },
     { label: 'Profile', path: '/staff/profile' },
   ],
@@ -54,7 +57,9 @@ export default function DashboardLayout({ role = 'student' }) {
 
         <nav className="space-y-2">
           {items.map((item) => {
-            const active = location.pathname === item.path || (item.path !== '/student/dashboard' && location.pathname.startsWith(`${item.path}/`))
+            const active = location.pathname === item.path ||
+              (item.path === '/admin/users' && location.pathname === '/admin') ||
+              (item.path !== '/student/dashboard' && item.path !== '/admin' && location.pathname.startsWith(`${item.path}/`))
             return (
               <Link
                 key={item.path}

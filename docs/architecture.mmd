@@ -1,0 +1,71 @@
+flowchart TB
+    subgraph Presentation["Presentation Tier - React 19 + Vite"]
+        Student["Student Dashboard"]
+        Staff["Maintenance Staff Dashboard"]
+        Admin["Admin Dashboard"]
+    end
+
+    subgraph Application["Application Tier - Node.js + Express"]
+        API["REST API"]
+        Auth["Authentication Service<br/>JWT + Role Authorization"]
+        UserService["User Management"]
+        ComplaintService["Complaint Management"]
+        AssignmentService["Assignment Service"]
+        MaintenanceService["Maintenance Service"]
+        FeedbackService["Feedback Service"]
+        NotificationService["Notification Service"]
+        AnnouncementService["Announcement Service"]
+        Analytics["Dashboard & Analytics"]
+    end
+
+    subgraph DataTier["Data Tier - MongoDB"]
+        Mongo[("MongoDB Database")]
+        Users["Users Collection"]
+        Complaints["Complaints Collection"]
+        Feedback["Feedback Collection"]
+        Notifications["Notifications Collection"]
+        Announcements["Announcements Collection"]
+    end
+
+    Student -->|"HTTP / JSON"| API
+    Staff -->|"HTTP / JSON"| API
+    Admin -->|"HTTP / JSON"| API
+
+    API --> Auth
+    Auth --> UserService
+    Auth --> ComplaintService
+    Auth --> AssignmentService
+    Auth --> MaintenanceService
+    Auth --> FeedbackService
+    Auth --> NotificationService
+    Auth --> AnnouncementService
+    Auth --> Analytics
+
+    UserService --> Mongo
+    ComplaintService --> Mongo
+    AssignmentService --> Mongo
+    MaintenanceService --> Mongo
+    FeedbackService --> Mongo
+    NotificationService --> Mongo
+    AnnouncementService --> Mongo
+    Analytics --> Mongo
+
+    Mongo --- Users
+    Mongo --- Complaints
+    Mongo --- Feedback
+    Mongo --- Notifications
+    Mongo --- Announcements
+
+    classDef presentation fill:#2563eb,stroke:#60a5fa,stroke-width:2px,color:#ffffff
+    classDef application fill:#7c3aed,stroke:#a78bfa,stroke-width:2px,color:#ffffff
+    classDef auth fill:#ea580c,stroke:#fb923c,stroke-width:2px,color:#ffffff
+    classDef api fill:#0891b2,stroke:#22d3ee,stroke-width:2px,color:#ffffff
+    classDef data fill:#059669,stroke:#34d399,stroke-width:2px,color:#ffffff
+    classDef database fill:#16a34a,stroke:#86efac,stroke-width:3px,color:#ffffff
+
+    class Student,Staff,Admin presentation
+    class API api
+    class Auth auth
+    class UserService,ComplaintService,AssignmentService,MaintenanceService,FeedbackService,NotificationService,AnnouncementService,Analytics application
+    class Users,Complaints,Feedback,Notifications,Announcements data
+    class Mongo database

@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 import DashboardLayout from './layouts/DashboardLayout'
 import Landing from './pages/public/Landing'
 import Login from './pages/public/Login'
@@ -19,6 +20,10 @@ import StaffTasks from './pages/staff/StaffTasks'
 import StaffComplaintDetails from './pages/staff/StaffComplaintDetails'
 import NotificationsPage from './pages/shared/NotificationsPage'
 import AdminFeedback from './pages/admin/AdminFeedback'
+import AdminAnnouncements from './pages/admin/AdminAnnouncements'
+import AdminReports from './pages/admin/AdminReports'
+import AnnouncementsPage from './pages/shared/AnnouncementsPage'
+import AnnouncementDetails from './pages/shared/AnnouncementDetails'
 
 export default function App() {
   return (
@@ -35,18 +40,24 @@ export default function App() {
             <Route path="/student/complaints/new" element={<NewComplaint />} />
             <Route path="/student/complaints/:id" element={<ComplaintDetails />} />
             <Route path="/student/notifications" element={<NotificationsPage />} />
+            <Route path="/student/announcements" element={<AnnouncementsPage />} />
+            <Route path="/student/announcements/:id" element={<AnnouncementDetails />} />
             <Route path="/student/profile" element={<Navigate to="/student/dashboard" replace />} />
           </Route>
 
-          <Route element={<ProtectedRoute allowedRoles={['admin']}><DashboardLayout role="admin" /></ProtectedRoute>}>
+          <Route path="/admin" element={<AdminRoute><DashboardLayout role="admin" /></AdminRoute>}>
+            <Route index element={<AdminStudents />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/complaints" element={<AdminComplaints />} />
             <Route path="/admin/complaints/:id" element={<AdminComplaintDetails />} />
             <Route path="/admin/students" element={<AdminStudents />} />
+            <Route path="/admin/users" element={<AdminStudents />} />
             <Route path="/admin/staff" element={<AdminStaff />} />
             <Route path="/admin/feedback" element={<AdminFeedback />} />
-            <Route path="/admin/reports" element={<AdminDashboard />} />
+            <Route path="/admin/reports" element={<AdminReports />} />
             <Route path="/admin/notifications" element={<NotificationsPage />} />
+            <Route path="/admin/announcements" element={<AdminAnnouncements />} />
+            <Route path="/admin/announcements/:id" element={<AnnouncementDetails />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['staff']}><DashboardLayout role="staff" /></ProtectedRoute>}>
@@ -54,6 +65,8 @@ export default function App() {
             <Route path="/staff/complaints" element={<StaffTasks />} />
             <Route path="/staff/complaints/:id" element={<StaffComplaintDetails />} />
             <Route path="/staff/notifications" element={<NotificationsPage />} />
+            <Route path="/staff/announcements" element={<AnnouncementsPage />} />
+            <Route path="/staff/announcements/:id" element={<AnnouncementDetails />} />
             <Route path="/staff/profile" element={<StaffDashboard />} />
           </Route>
 

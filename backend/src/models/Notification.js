@@ -12,6 +12,11 @@ const notificationSchema = new mongoose.Schema(
       ref: 'Complaint',
       default: null,
     },
+    announcementId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Announcement',
+      default: null,
+    },
     message: {
       type: String,
       required: true,
@@ -28,5 +33,6 @@ const notificationSchema = new mongoose.Schema(
 );
 
 notificationSchema.index({ userId: 1, createdAt: -1 });
+notificationSchema.index({ announcementId: 1 });
 
 module.exports = mongoose.model('Notification', notificationSchema);
